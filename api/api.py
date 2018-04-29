@@ -3,11 +3,12 @@ import time
 import flask
 import jsonschema
 import prometheus_client
+import redis
 
 def initialize(name):
     app = flask.Flask(name)
-    request_latency = prometheus_client.Histogram('request_latency', 'request latency', ['endpoint', 'method', 'path', 'status'])
-    request_counter = prometheus_client.Counter('request_counter', 'request counter', ['endpoint', 'method', 'path', 'status'])
+    request_latency = prometheus_client.Histogram('request_latency', 'request latency', ['app', 'method', 'path', 'status'])
+    request_counter = prometheus_client.Counter('request_counter', 'request counter', ['app', 'method', 'path', 'status'])
     @app.route('/health')
     def health():
         return 'OK'
@@ -20,8 +21,8 @@ def initialize(name):
     @app.after_request
     def after_request(response):
         latency = time.time() - flask.request.start_time
-        request_latency.labels(endpoint=app.name, method=flask.request.method, path=flask.request.path, status=response.status_code).observe(latency)
-        request_counter.labels(endpoint=app.name, method=flask.request.method, path=flask.request.path, status=response.status_code).inc()
+        request_latency.labels(app=name, method=flask.request.method, path=flask.request.path, status=response.status_code).observe(latency)
+        request_counter.labels(app=name, method=flask.request.method, path=flask.request.path, status=response.status_code).inc()
         return response
     return app
 

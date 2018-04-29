@@ -1,16 +1,12 @@
 import json
 import flask
 import prometheus_client
-import redis
 import api
+import que
 
 app = api.initialize(__name__)
 
-queue_latency = prometheus_client.Histogram('queue_latency', 'queue latency', ['endpoint', 'method', 'path', 'queue'])
-
-redis_conn = redis.Redis('127.0.0.1', 6379)
-
-track_queue = 'track'
+push, _ = que.initialize(__name__, '127.0.0.1', 6379)
 
 # todo: authenticate provider
 @app.route('/track', methods=['POST'])
@@ -24,10 +20,13 @@ track_queue = 'track'
     'required': ['state', 'latitude', 'longitude']
 })
 def track():
-    with queue_latency.labels(endpoint=app.name, method=flask.request.method, path=flask.request.path, queue=track_queue).time():
-        redis_conn.rpush(track_queue, json.dumps(flask.request.json))
+    push('track', json.dumps({
+        'state': flask.request.json['state'],
+        'latitude': flask.request.json['latitude'], 
+        'longitude': flask.request.json['longitude']
+    }))
     return 'OK'
 
 if __name__=='__main__':
-    prometheus_client.start_http_server(port=5001)
-    app.run(port=5000)
+    prometheus_client.start_http_server(port=1000)
+    app.run(port=1001)
