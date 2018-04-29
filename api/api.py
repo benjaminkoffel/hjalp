@@ -6,8 +6,8 @@ import prometheus_client
 
 def initialize(name):
     app = flask.Flask(name)
-    metric_latency = prometheus_client.Histogram('request_latency', 'request latency', ['endpoint', 'method', 'path', 'status'])
-    metric_counter = prometheus_client.Counter('request_counter', 'request counter', ['endpoint', 'method', 'path', 'status'])
+    request_latency = prometheus_client.Histogram('request_latency', 'request latency', ['endpoint', 'method', 'path', 'status'])
+    request_counter = prometheus_client.Counter('request_counter', 'request counter', ['endpoint', 'method', 'path', 'status'])
     @app.route('/health')
     def health():
         return 'OK'
@@ -20,8 +20,8 @@ def initialize(name):
     @app.after_request
     def after_request(response):
         latency = time.time() - flask.request.start_time
-        metric_latency.labels(endpoint=app.name, method=flask.request.method, path=flask.request.path, status=response.status_code).observe(latency)
-        metric_counter.labels(endpoint=app.name, method=flask.request.method, path=flask.request.path, status=response.status_code).inc()
+        request_latency.labels(endpoint=app.name, method=flask.request.method, path=flask.request.path, status=response.status_code).observe(latency)
+        request_counter.labels(endpoint=app.name, method=flask.request.method, path=flask.request.path, status=response.status_code).inc()
         return response
     return app
 
