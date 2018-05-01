@@ -8,5 +8,5 @@ def received(value):
     # todo: notify nearby providers
 
 if __name__=='__main__':
-    prometheus_client.start_http_server(port=4000)
+    prometheus_client.start_http_server(port=7000)
     pop('dispatch', received)

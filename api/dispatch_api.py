@@ -1,4 +1,3 @@
-import json
 import flask
 import prometheus_client
 import api
@@ -19,12 +18,12 @@ push, _ = que.initialize(__name__, '127.0.0.1', 6379)
     'required': ['state', 'latitude', 'longitude']
 })
 def status():
-    push('dispatch', json.dumps({
+    push('dispatch', {
         'latitude': flask.request.json['latitude'], 
         'longitude': flask.request.json['longitude']
-    }))
+    })
     return 'OK'
 
 if __name__=='__main__':
-    prometheus_client.start_http_server(port=3000)
-    app.run(port=3001)
+    prometheus_client.start_http_server(port=6000)
+    app.run(port=6001)
