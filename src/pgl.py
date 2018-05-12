@@ -12,6 +12,7 @@ def initialize(name, host, port):
         except Exception as e:
             print('ERROR', e)
             time.sleep(1)
+    execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
     def execute(query, values=None):
         with db_latency.labels(app=name, query=query).time():
             cursor = postgres.cursor()
@@ -21,8 +22,4 @@ def initialize(name, host, port):
             cursor.close()
         db_counter.labels(app=name, query=query).inc()
         return data
-    execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
-    execute('CREATE TABLE IF NOT EXISTS accept (time TIMESTAMP, dispatch UUID, provider UUID);')
-    execute('CREATE TABLE IF NOT EXISTS dispatch (time TIMESTAMP, dispatch UUID, consumer UUID, latitude SMALLINT, longitude SMALLINT, state SMALLINT);')
-    execute('CREATE TABLE IF NOT EXISTS track (time TIMESTAMP, provider UUID, state TEXT, latitude SMALLINT, longitude SMALLINT);')
     return execute

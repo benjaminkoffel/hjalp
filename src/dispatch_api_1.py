@@ -20,12 +20,12 @@ produce = stream.producer(__name__, os.environ['KAFKA_HOST'], os.environ['KAFKA_
 })
 def dispatch():
     consumer = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' # todo: use identity
-    produce('queue_dispatch_1', consumer, {
+    produce('queue_dispatch_1', consumer, schema.validate(schema.queue_track_1, {
         'time': str(datetime.datetime.now(datetime.timezone.utc)),
         'consumer': consumer,
         'latitude': flask.request.json['latitude'], 
         'longitude': flask.request.json['longitude']
-    })
+    }))
     return 'OK'
 
 if __name__=='__main__':

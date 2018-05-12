@@ -1,6 +1,7 @@
 Flask==1.0
 jsonschema==2.6.0
 kafka-python==1.4.2
+kazoo==2.4.0
 prometheus-client==0.2.0
-redis==2.10.6
 psycopg2==2.7.4
+# redis==2.10.6

@@ -1,6 +1,6 @@
-import db
+import cassandra.cluster
+import cassandra.policies
 
-execute = db.initialize()
-execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
-# execute('DROP TABLE track;')
-execute('CREATE TABLE track (time TIMESTAMP, provider UUID, state TEXT, latitude SMALLINT, longitude SMALLINT);')
+session = cassandra.cluster.Cluster(['localhost'], load_balancing_policy=cassandra.policies.RoundRobinPolicy(), port=9042).connect()
+session.execute("CREATE KEYSPACE IF NOT EXISTS hjalp WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '2' }")
+session.set_keyspace('hjalp')

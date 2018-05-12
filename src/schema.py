@@ -4,10 +4,20 @@ def validate(schema, value):
     jsonschema.validate(value, schema)
     return value
 
+request_track_1 = {
+    'type': 'object',
+    'properties': {
+        'state': { 'type': 'string', 'pattern': 'online|offline' },
+        'latitude': { 'type': 'number' },
+        'longitude': { 'type': 'number' },
+    },
+    'required': ['state', 'latitude', 'longitude']
+}
+
 queue_track_1 = {
     'type': 'object',
     'properties': {
-        'time': { 'type': 'string' },
+        'time': { 'type': 'number' },
         'provider': { 'type': 'string' },
         'state': { 'type': 'string', 'pattern': 'online|offline' },
         'latitude': { 'type': 'number' },
