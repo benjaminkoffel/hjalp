@@ -1,0 +1,48 @@
+version: '3'
+services:
+
+  postgres:
+    image: postgres
+    ports:
+    - 5432:5432
+    environment:
+    - POSTGRES_PASSWORD=password
+
+  # cassandra:
+  #   image: cassandra
+  #   ports:
+  #   - 7199:7199
+  #   - 7000:7000
+  #   - 7001:7001
+  #   - 9160:9160
+  #   - 9042:9042
+
+  kafka:
+    image: spotify/kafka
+    ports:
+    - 2181:2181
+    - 9092:9092
+    environment:
+    - ADVERTISED_HOST=localhost
+    - ADVERTISED_PORT=9092
+
+  track_api:
+    build: src
+    command: python3 track_api.py
+    ports:
+    - 4010:4010
+    - 4011:4011
+    environment:
+    - KAFKA_HOST=localhost
+    - KAFKA_PORT=9092
+
+  track_consumer:
+    build: src
+    command: python3 track_consumer.py
+    ports:
+    - 4020:4020
+    environment:
+    - KAFKA_HOST=localhost
+    - KAFKA_PORT=9092
+    - POSTGRES_HOST=postgres
+    - POSTGRES_PORT=5432
